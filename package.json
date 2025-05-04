@@ -1,6 +1,6 @@
 {
   "name": "mcp-server-reddit-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Model Context Protocol server for interacting with Reddit content (TypeScript version)",
   "type": "module",
   "main": "build/index.js",

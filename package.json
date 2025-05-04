@@ -1,25 +1,16 @@
 {
   "name": "reddit-mcp",
-  "version": "1.0.5",
-  "description": "Reddit MCP Server - Model Context Protocol server for browsing Reddit",
+  "version": "1.0.0",
+  "description": "Reddit MCP Server - 浏览 Reddit 的模型上下文协议服务器",
   "type": "module",
+  "main": "index.js",
   "bin": {
-    "reddit-mcp": "./bin/index.js"
+    "reddit-mcp": "./index.js"
   },
-  "main": "src/server.js",
   "scripts": {
-    "start": "node bin/index.js",
-    "test": "echo \"No tests yet\" && exit 0",
-    "lint": "echo \"No linting yet\" && exit 0",
-    "build": "chmod +x bin/index.js",
-    "prepublishOnly": "npm run build"
+    "start": "node index.js",
+    "prepare": "chmod +x index.js"
   },
-  "files": [
-    "bin/",
-    "src/",
-    "README.md",
-    "LICENSE"
-  ],
   "keywords": [
     "mcp",
     "reddit",
@@ -34,10 +25,6 @@
     "dotenv": "^16.5.0",
     "node-fetch": "^3.3.2",
     "zod": "^3.24.3"
-  },
-  "devDependencies": {
-    "eslint": "^9.26.0",
-    "jest": "^29.7.0"
   },
   "engines": {
     "node": ">=18.0.0"

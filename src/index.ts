@@ -7,8 +7,12 @@ import fetch from 'node-fetch';
 
 // 常量定义
 const REDDIT_BASE_URL = 'https://www.reddit.com';
-const REDDIT_API_BASE = 'https://api.reddit.com';
-const USER_AGENT = 'mcp-server-reddit/1.0.0';
+const REDDIT_API_BASE = 'https://www.reddit.com';  // 使用 www.reddit.com 而不是 api.reddit.com
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
+const APP_NAME = 'mcp-server-reddit-ts:v1.0.0 (by /u/your_username)';
+
+// 添加延迟函数，避免速率限制
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Reddit 相关接口定义
 interface RedditPost {
@@ -64,36 +68,43 @@ const server = new McpServer({
 });
 
 /**
- * 修改makeRedditApiRequest函数，添加更好的错误日志
+ * 发起 Reddit API 请求
  */
 async function makeRedditApiRequest<T>(path: string, params: Record<string, string> = {}): Promise<T | null> {
   try {
-    // 添加.json扩展名（如果没有）
-    const jsonPath = path.endsWith('.json') ? path : `${path}.json`;
+    // 确保 path 以 .json 结尾，这是 Reddit 公共 API 的要求
+    if (!path.endsWith('.json')) {
+      path = `${path}.json`;
+    }
     
     // 构建 URL 参数
     const queryParams = new URLSearchParams(params).toString();
-    const url = `${REDDIT_API_BASE}${jsonPath}${queryParams ? `?${queryParams}` : ''}`;
+    const url = `${REDDIT_API_BASE}${path}${queryParams ? `?${queryParams}` : ''}`;
     
-    console.log(`[DEBUG] 请求URL: ${url}`);
+    console.log(`Making request to: ${url}`);
     
-    // 发起请求
+    // 发起请求，添加必要的头部信息
     const response = await fetch(url, {
       headers: {
-        'User-Agent': USER_AGENT
+        'User-Agent': USER_AGENT,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Connection': 'keep-alive'
       }
     });
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => '无法获取错误详情');
-      console.error(`[ERROR] API错误 (${response.status}): ${errorText}`);
-      throw new Error(`HTTP错误: ${response.status} - ${response.statusText}`);
+      throw new Error(`HTTP Error: ${response.status} - ${await response.text()}`);
     }
 
-    const data = await response.json();
-    return data as T;
+    const json = await response.json();
+    
+    // 添加延迟，避免速率限制
+    await delay(1000);
+    
+    return json as T;
   } catch (error) {
-    console.error('[ERROR] 无法发起Reddit API请求:', error);
+    console.error('[ERROR] Failed to make Reddit API request:', error);
     return null;
   }
 }
@@ -505,8 +516,8 @@ server.tool(
         };
       }
 
-      // 获取帖子内容和评论
-      const response = await makeRedditApiRequest<any>(`/comments/${extractedId}`, { 
+      // 获取帖子内容和评论 - 使用 comments 路径
+      const response = await makeRedditApiRequest<any>(`/r/all/comments/${extractedId}`, { 
         limit: comment_limit.toString(),
         depth: comment_depth.toString() 
       });
@@ -629,8 +640,8 @@ server.tool(
         };
       }
 
-      // 获取帖子评论
-      const response = await makeRedditApiRequest<any>(`/comments/${extractedId}`, { 
+      // 获取帖子评论 - 使用 comments 路径
+      const response = await makeRedditApiRequest<any>(`/r/all/comments/${extractedId}`, { 
         limit: limit.toString()
       });
       

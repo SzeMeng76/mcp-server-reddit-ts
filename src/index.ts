@@ -68,9 +68,14 @@ const server = new McpServer({
  */
 async function makeRedditApiRequest<T>(path: string, params: Record<string, string> = {}): Promise<T | null> {
   try {
+    // 如果路径不以.json结尾，添加.json扩展名
+    const jsonPath = path.endsWith('.json') ? path : `${path}.json`;
+    
     // 构建 URL 参数
     const queryParams = new URLSearchParams(params).toString();
-    const url = `${REDDIT_API_BASE}${path}${queryParams ? `?${queryParams}` : ''}`;
+    const url = `${REDDIT_API_BASE}${jsonPath}${queryParams ? `?${queryParams}` : ''}`;
+    
+    console.log(`发送请求到: ${url}`); // 调试日志
     
     // 发起请求
     const response = await fetch(url, {
@@ -80,15 +85,22 @@ async function makeRedditApiRequest<T>(path: string, params: Record<string, stri
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`API错误 (${response.status}): ${errorText}`);
+      throw new Error(`HTTP错误: ${response.status} - ${response.statusText}`);
     }
 
-    return await response.json() as T;
+    const data = await response.json();
+    return data as T;
   } catch (error) {
-    console.error('[ERROR] Failed to make Reddit API request:', error);
+    console.error('[错误] 无法发起Reddit API请求:', error);
     return null;
   }
 }
+
+// 更新get_frontpage_posts工具中的首页端点
+// ...existing code...
+const response = await makeRedditApiRequest<any>('/hot.json', { limit: limit.toString() });
 
 /**
  * 格式化 Reddit 帖子

@@ -1,3 +1,8 @@
+/**
+ * 格式化 subreddit 数据
+ * @param {Object} subreddit - Reddit subreddit 数据对象
+ * @returns {string} 格式化后的 subreddit 信息
+ */
 export function formatSubredditData(subreddit) {
   return `
 Subreddit: r/${subreddit.display_name}
@@ -10,6 +15,11 @@ URL: https://www.reddit.com${subreddit.url}
   `.trim();
 }
 
+/**
+ * 格式化 subreddit 搜索结果
+ * @param {Array} subreddits - Reddit subreddit 搜索结果数组
+ * @returns {string} 格式化后的搜索结果信息
+ */
 export function formatSubredditSearchResults(subreddits) {
   if (!subreddits || subreddits.length === 0) {
     return 'No subreddits found matching the search criteria.';

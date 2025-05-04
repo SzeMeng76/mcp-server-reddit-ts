@@ -1,6 +1,6 @@
 {
   "name": "reddit-mcp",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Reddit MCP Server - Model Context Protocol server for browsing Reddit",
   "type": "module",
   "bin": {

@@ -28,9 +28,9 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: npm install
       
-      - name: Build
+      - name: Make script executable
         if: steps.check.outputs.changed == 'true'
-        run: npm run build
+        run: chmod +x index.js
       
       - name: Publish to NPM
         if: steps.check.outputs.changed == 'true'

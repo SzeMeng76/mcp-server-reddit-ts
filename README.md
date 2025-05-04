@@ -1,158 +1,106 @@
-# MCP Server Reddit (TypeScript)
+# Reddit MCP Server
 
-一个 Model Context Protocol (MCP) 服务器，提供 Reddit 内容获取功能，包括首页热门帖子、子版块信息和热门帖子、帖子详情及评论等功能。这是使用 TypeScript 实现的版本。
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for browsing, searching, and reading Reddit content. This implementation is fully written in JavaScript/Node.js, making it easy to use with `npx`.
 
-## 功能特性
+## Features
 
-- 获取 Reddit 首页热门帖子
-- 获取特定子版块信息
-- 获取特定子版块的热门帖子
-- 获取特定子版块的最新帖子
-- 获取特定子版块的最佳帖子（按时间段过滤）
-- 获取特定子版块的新兴帖子
-- 获取特定帖子的详细内容和评论
-- 获取特定帖子的评论
+- Browse subreddits, posts, and comments
+- Search for content across Reddit
+- No Reddit account required for read-only access
+- Robust input validation with Zod
 
-## 安装与使用
+## Prerequisites
 
-你可以通过两种方式使用该包：
+Before you begin, ensure you have the following:
 
-### 1. 通过 npx 直接使用
+- Node.js 18 or higher
+- A Reddit API client ID and client secret
+
+### Creating a Reddit API Application
+
+1. Go to [Reddit's App Preferences](https://www.reddit.com/prefs/apps)
+2. Click "Create App" or "Create Another App" at the bottom
+3. Fill in the form:
+   - Name: Choose any name (e.g., "MCP Client")
+   - App type: Select "script"
+   - Description: Optional
+   - About URL: Optional
+   - Redirect URI: Use `http://localhost:8080`
+4. Click "Create app"
+5. Note your `client_id` (the string under the app name) and `client_secret`
+
+## Usage
+
+You can use this package with npx without installing it globally:
 
 ```bash
-npx mcp-server-reddit-ts
+# Set environment variables
+export REDDIT_CLIENT_ID=your_client_id
+export REDDIT_CLIENT_SECRET=your_client_secret
+
+# Run the MCP server
+npx reddit-mcp
 ```
 
-### 2. 全局安装
+Alternatively, you can create a `.env` file in the current directory:
+
+```
+REDDIT_CLIENT_ID=your_client_id
+REDDIT_CLIENT_SECRET=your_client_secret
+```
+
+Then run:
 
 ```bash
-npm install -g mcp-server-reddit-ts
-mcp-server-reddit-ts
+npx reddit-mcp
 ```
 
-## 在 Claude Desktop 中使用
+## Using with Claude Desktop
 
-将以下内容添加到你的 Claude Desktop 配置文件中：
+To use this server with Claude Desktop:
+
+1. Follow the instructions [here](https://modelcontextprotocol.io/quickstart/user) to open your Claude Desktop configuration file.
+
+2. Add the following to the file:
 
 ```json
-{
-  "mcpServers": {
-    "reddit": {
-      "command": "npx",
-      "args": ["mcp-server-reddit-ts"]
+"mcpServers": {
+  "reddit": {
+    "command": "npx",
+    "args": ["reddit-mcp"],
+    "env": {
+      "REDDIT_CLIENT_ID": "your_client_id",
+      "REDDIT_CLIENT_SECRET": "your_client_secret"
     }
   }
 }
 ```
 
-## 在 Zed 中使用
+3. Restart Claude Desktop.
 
-将以下内容添加到你的 Zed settings.json 文件中：
+## Available Tools
 
-```json
-"context_servers": {
-  "mcp-server-reddit": {
-    "command": "npx",
-    "args": ["mcp-server-reddit-ts"]
-  }
-}
-```
+The server exposes the following tools:
 
-## 可用工具
+| Name | Description |
+|------|-------------|
+| get_comment | Access a comment |
+| get_comments_by_submission | Access comments of a submission |
+| get_submission | Access a submission |
+| get_subreddit | Access a subreddit by name |
+| search_posts | Search posts in a subreddit |
+| search_subreddits | Search subreddits by name or description |
 
-该服务器提供以下工具：
+## License
 
-### get_frontpage_posts
+This package is MIT licensed.
 
-获取 Reddit 首页热门帖子。
+## Development
 
-示例提示：
-> "获取 Reddit 首页上的热门帖子"
+If you want to modify or extend this MCP server:
 
-### get_subreddit_info
-
-获取子版块信息。
-
-示例提示：
-> "请告诉我关于 r/Python 的信息"
-
-### get_subreddit_hot_posts
-
-获取子版块的热门帖子。
-
-示例提示：
-> "获取 r/Programming 子版块中的热门帖子"
-
-### get_subreddit_new_posts
-
-获取子版块的最新帖子。
-
-示例提示：
-> "显示 r/news 中最新的帖子"
-
-### get_subreddit_top_posts
-
-获取子版块的最佳帖子。
-
-示例提示：
-> "获取 r/AskReddit 中所有时间最佳的帖子"
-
-### get_subreddit_rising_posts
-
-获取子版块的新兴帖子。
-
-示例提示：
-> "r/technology 中现在有哪些正在上升的帖子？"
-
-### get_post_content
-
-获取特定帖子的详细内容和评论。
-
-示例提示：
-> "获取这个 Reddit 帖子的完整内容和评论：[帖子URL]"
-
-### get_post_comments
-
-获取帖子的评论。
-
-示例提示：
-> "总结一下这个 Reddit 帖子的评论：[帖子URL]"
-
-## 开发
-
-### 前提条件
-
-- Node.js 18+
-- npm 或 yarn
-
-### 设置
-
-1. 克隆仓库
-2. 安装依赖：
-   ```bash
-   npm install
-   ```
-3. 构建项目：
-   ```bash
-   npm run build
-   ```
-4. 运行服务器：
-   ```bash
-   npm start
-   ```
-
-### 使用 MCP Inspector 进行测试
-
-用于调试和测试你的服务器：
-
-```bash
-npm run inspector
-```
-
-## 许可证
-
-MIT
-
-## 致谢
-
-本服务器使用 Reddit 公共 API 获取数据。
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Make your changes
+4. Test locally: `npm start`
+5. Publish to npm (if applicable)

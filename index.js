@@ -135,22 +135,48 @@ server.tool(
     '在 subreddit 中搜索帖子',
     {
         subreddit: z.string().describe('要搜索的 subreddit 名称'),
-        query: z.string().describe('搜索查询'),
-        sort: z.enum(['relevance', 'hot', 'new', 'top', 'comments']).optional().describe('结果排序方式'),
-        time: z.enum(['all', 'hour', 'day', 'week', 'month', 'year']).optional().describe('搜索时间范围'),
-        limit: z.number().min(1).max(100).optional().describe('返回的最大帖子数量')
+        query: z.string().optional().describe('搜索查询').default(''), // 将query设为可选，并提供默认值
+        sort: z.enum(['relevance', 'hot', 'new', 'top', 'comments']).optional().describe('结果排序方式').default('hot'),
+        time: z.enum(['all', 'hour', 'day', 'week', 'month', 'year']).optional().describe('搜索时间范围').default('all'),
+        limit: z.number().min(1).max(100).optional().describe('返回的最大帖子数量').default(10)
     },
-    async ({ subreddit, query, sort = 'relevance', time = 'all', limit = 10 }) => {
+    async ({ subreddit, query = '', sort = 'hot', time = 'all', limit = 10 }) => {
         try {
-            const params = {
-                q: query,
-                sort,
-                t: time,
-                limit: limit.toString(),
-                restrict_sr: 'true'
-            };
+            // 如果提供了查询，则执行搜索，否则获取热门帖子
+            let endpoint;
+            let params = {};
             
-            const results = await redditApiRequest(`/r/${subreddit}/search`, params);
+            if (query && query.trim() !== '') {
+                // 有查询词时进行搜索
+                endpoint = `/r/${subreddit}/search`;
+                params = {
+                    q: query,
+                    sort,
+                    t: time,
+                    limit: limit.toString(),
+                    restrict_sr: 'true'
+                };
+            } else {
+                // 无查询词时根据sort返回对应的帖子列表
+                switch (sort) {
+                    case 'hot':
+                        endpoint = `/r/${subreddit}/hot`;
+                        break;
+                    case 'new':
+                        endpoint = `/r/${subreddit}/new`;
+                        break;
+                    case 'top':
+                        endpoint = `/r/${subreddit}/top`;
+                        params.t = time;
+                        break;
+                    default:
+                        endpoint = `/r/${subreddit}/hot`;
+                }
+                
+                params.limit = limit.toString();
+            }
+            
+            const results = await redditApiRequest(endpoint, params);
             
             return {
                 content: [

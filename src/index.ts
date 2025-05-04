@@ -99,21 +99,6 @@ async function makeRedditApiRequest<T>(path: string, params: Record<string, stri
 }
 
 /**
- * 检查所有工具函数确保参数正确声明
- */
-// 例如，修改get_frontpage_posts工具的实现：
-server.tool(
-  'get_frontpage_posts',
-  'Get hot posts from Reddit frontpage',
-  {
-    limit: z.number().min(1).max(100).default(10).describe('Number of posts to return (default: 10, range: 1-100)')
-  },
-  async ({ limit }) => {  // 确保这里正确解构了limit参数
-    try {
-      // 修改路径添加.json后缀
-      const response = await makeRedditApiRequest<any>('/hot.json', { limit: limit.toString() });
-
-/**
  * 格式化 Reddit 帖子
  */
 function formatRedditPost(post: any): RedditPost {

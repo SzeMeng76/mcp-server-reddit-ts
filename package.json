@@ -1,6 +1,6 @@
 {
   "name": "reddit-mcp",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Reddit MCP Server - 浏览 Reddit 的模型上下文协议服务器",
   "type": "module",
   "main": "index.js",
